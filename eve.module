@@ -37,9 +37,9 @@ function eve_field_extra_fields() {
  */
 function eve_entity_view($entity, $type, $view_mode, $langcode) {
   $entity_data = entity_get_info($type);
-  $bundle = _evee_entity_get_bundle($entity, $type);
-  $settings = field_view_mode_settings($type, $bundle);
-  $fields = field_extra_fields_get_display($type, $bundle, $view_mode);
+  $entity_ids = entity_extract_ids($type, $entity);
+  $settings = field_view_mode_settings($type, $entity_ids[2]);
+  $fields = field_extra_fields_get_display($type, $entity_ids[2], $view_mode);
   $views = eve_get_views($type);
 
   foreach ($views as $info) {
@@ -140,17 +140,4 @@ function eve_get_arguments_from_token_string($string, $type, $object) {
   }
   $args = token_replace($args, array($type => $object), array('sanitize' => FALSE));
   return explode('/', $args);
-}
-
-/**
- * Get the name of a given entity's bundle, given the entity. There is no reason
- * this shouldn't be in core. Seriously.
- */
-function _evee_entity_get_bundle($entity, $entity_type) {
-  $info = entity_get_info($entity_type);
-  if (empty($info['entity keys']['bundle'])) {
-    return $entity_type;
-  } else {
-    return $entity->{$info['entity keys']['bundle']};
-  }
 }
