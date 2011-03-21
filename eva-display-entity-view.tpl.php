@@ -1,6 +1,6 @@
 <?php
 /**
- * @file eve-display-entity-view.tpl.php
+ * @file eva-display-entity-view.tpl.php
  * Entity content view template
  *
  * Variables available:

@@ -3,7 +3,7 @@
 /**
  * Implements hook_views_api().
  */
-function eve_views_api() {
+function eva_views_api() {
   return array(
     'api' => 3,
   );
@@ -13,9 +13,9 @@ function eve_views_api() {
 /**
  * Implements hook_content_extra_fields().
  */
-function eve_field_extra_fields() {
+function eva_field_extra_fields() {
   $extras = array();
-  $views = eve_get_views();
+  $views = eva_get_views();
   
   foreach ($views as $entity => $data) {
     foreach ($data as $view) {
@@ -35,12 +35,12 @@ function eve_field_extra_fields() {
 /**
  * Implements hook_entity_view().
  */
-function eve_entity_view($entity, $type, $view_mode, $langcode) {
+function eva_entity_view($entity, $type, $view_mode, $langcode) {
   $entity_data = entity_get_info($type);
   $entity_ids = entity_extract_ids($type, $entity);
   $settings = field_view_mode_settings($type, $entity_ids[2]);
   $fields = field_extra_fields_get_display($type, $entity_ids[2], $view_mode);
-  $views = eve_get_views($type);
+  $views = eva_get_views($type);
 
   foreach ($views as $info) {
     $longname = $info['name'] .'_'. $info['display'];
@@ -76,7 +76,7 @@ function eve_entity_view($entity, $type, $view_mode, $langcode) {
  * @return
  *   An array of view name/display name values, or an empty array().
  */
-function eve_get_views($type = NULL, $reset = FALSE) {
+function eva_get_views($type = NULL, $reset = FALSE) {
   $used_views = &drupal_static(__FUNCTION__);
 
   if (!isset($used_views) || $reset) {
@@ -84,7 +84,7 @@ function eve_get_views($type = NULL, $reset = FALSE) {
     
     // If we're not resetting, check the Views cache.
     if (!$reset) {
-      $cache = views_cache_get("eve");
+      $cache = views_cache_get("eva:);
       if (isset($cache->data)) {
         $used_views = $cache->data;
       }
@@ -105,7 +105,7 @@ function eve_get_views($type = NULL, $reset = FALSE) {
         );
         $view->destroy();
       }
-      views_cache_set("eve", $used_views);
+      views_cache_set("eva:, $used_views);
     }
   }
 
@@ -133,7 +133,7 @@ function eve_get_views($type = NULL, $reset = FALSE) {
  *
  * @todo: security?
  */
-function eve_get_arguments_from_token_string($string, $type, $object) {
+function eva_get_arguments_from_token_string($string, $type, $object) {
   $args = trim($string);
   if (empty($args)) {
     return array();

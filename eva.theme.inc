@@ -5,7 +5,7 @@
  * Preprocess handlers for theme functions
  */
 
-function template_preprocess_eve_display_entity_view(&$vars) {
+function template_preprocess_eva_display_entity_view(&$vars) {
   template_preprocess_views_view($vars);
   $view = $vars['view'];
   $display = $view->display_handler;

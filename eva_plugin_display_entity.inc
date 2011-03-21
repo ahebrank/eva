@@ -3,7 +3,7 @@
 /**
  * The plugin that handles entity-attached views.
  */
-class eve_plugin_display_entity extends views_plugin_display {
+class eva_plugin_display_entity extends views_plugin_display {
   function option_definition() {
     $options = parent::option_definition();
 
@@ -86,7 +86,7 @@ class eve_plugin_display_entity extends views_plugin_display {
         $form['entity_type'] = array(
           '#type' => 'radios',
           '#required' => TRUE,
-          '#title' => t("Embed this display on the following entity type"),
+          '#title' => t("Attache this display to the following entity type"),
           '#options' => $entity_names,
           '#default_value' => $this->get_option('entity_type'),
         );
@@ -99,7 +99,7 @@ class eve_plugin_display_entity extends views_plugin_display {
         $form['#title'] .= t('Bundles');
         $form['bundles'] = array(
           '#type' => 'checkboxes',
-          '#title' => t("Embed this display on the following bundles"),
+          '#title' => t("Attache this display to the following bundles"),
           '#options' => $options,
           '#default_value' => $this->get_option('bundles'),
         );
@@ -223,7 +223,7 @@ class eve_plugin_display_entity extends views_plugin_display {
     if ($arg_mode == 'token') {
       if ($token_string = $this->view->display_handler->get_option('default_argument')) {
         // Now do the token replacement.
-        $token_values = eve_get_arguments_from_token_string($token_string, $entity_type, $entity);
+        $token_values = eva_get_arguments_from_token_string($token_string, $entity_type, $entity);
         $new_args = array();
         // We have to be careful to only replace arguments that have tokens.
         foreach ($token_values as $key => $value) {
