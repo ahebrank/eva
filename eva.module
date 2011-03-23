@@ -21,7 +21,7 @@ function eva_field_extra_fields() {
     foreach ($data as $view) {
       foreach ($view['bundles'] as $bundle) {
         $extras[$entity][$bundle]['display'][$view['name'] . '_' . $view['display']] = array(
-          'label' => $view['title'], 
+          'label' => (empty($view['title'])) ? $view['name'] : $view['title'], 
           'description' => $view['title'], 
           'weight' => 10,
         );
