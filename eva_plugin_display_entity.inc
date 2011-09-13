@@ -86,7 +86,7 @@ class eva_plugin_display_entity extends views_plugin_display {
         $form['entity_type'] = array(
           '#type' => 'radios',
           '#required' => TRUE,
-          '#title' => t("Attache this display to the following entity type"),
+          '#title' => t("Attach this display to the following entity type"),
           '#options' => $entity_names,
           '#default_value' => $this->get_option('entity_type'),
         );
@@ -99,7 +99,7 @@ class eva_plugin_display_entity extends views_plugin_display {
         $form['#title'] .= t('Bundles');
         $form['bundles'] = array(
           '#type' => 'checkboxes',
-          '#title' => t("Attache this display to the following bundles"),
+          '#title' => t("Attach this display to the following bundles"),
           '#options' => $options,
           '#default_value' => $this->get_option('bundles'),
         );
