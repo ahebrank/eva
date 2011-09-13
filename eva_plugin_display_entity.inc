@@ -27,6 +27,10 @@ class eva_plugin_display_entity extends views_plugin_display {
 
     $categories['entity_view'] = array(
       'title' => t('Entity content settings'),
+      'column' => 'second',
+      'build' => array(
+        '#weight' => -10,
+      ),
     );
 
     if ($entity_type = $this->get_option('entity_type')) {
