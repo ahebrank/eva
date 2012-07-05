@@ -109,7 +109,7 @@ function eva_get_views($type = NULL, $reset = FALSE) {
         $view_entity = $view->display_handler->get_option('entity_type');
         $used_views[$view_entity][] = array(
           'name' => $view->name,
-          'title' => $view->get_title(),
+          'title' => $view->get_human_name() . ' > ' . $view->display[$display_id]->display_title,
           'display' => $display_id,
           'bundles' => $view->display_handler->get_option('bundles'),
         );
