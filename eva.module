@@ -1,5 +1,8 @@
 <?php
 
+// Load theme functions
+module_load_include('inc', 'eva', 'eva.theme');
+
 /**
  * Implements hook_views_api().
  */
