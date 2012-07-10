@@ -84,7 +84,7 @@ function eva_get_views($type = NULL, $reset = FALSE) {
     
     // If we're not resetting, check the Views cache.
     if (!$reset) {
-      $cache = views_cache_get("eva:);
+      $cache = views_cache_get("eva");
       if (isset($cache->data)) {
         $used_views = $cache->data;
       }
@@ -105,7 +105,7 @@ function eva_get_views($type = NULL, $reset = FALSE) {
         );
         $view->destroy();
       }
-      views_cache_set("eva:, $used_views);
+      views_cache_set("eva", $used_views);
     }
   }
 
