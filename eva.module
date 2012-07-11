@@ -193,3 +193,23 @@ function eva_get_arguments_from_token_string($string, $type, $object) {
   $args = token_replace($args, array($type => $object), array('sanitize' => FALSE));
   return explode('/', $args);
 }
+
+/**
+ * Implements hook_modules_enabled().
+ */
+function eva_modules_enabled($modules) {
+  // Reset the static cache in case any of the enabled modules
+  // implement an eva view
+  drupal_static_reset('eva_get_views');
+  cache_clear_all('*', 'cache_views', TRUE);
+}
+
+/**
+ * Implements hook_modules_disabled().
+ */
+function eva_modules_disabled($modules) {
+  // Reset the static cache in case any of the disabled modules
+  // implemented an eva view
+  drupal_static_reset('eva_get_views');
+  cache_clear_all('*', 'cache_views', TRUE);
+}
