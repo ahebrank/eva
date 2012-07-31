@@ -229,16 +229,6 @@ class eva_plugin_display_entity extends views_plugin_display {
   }
 
   /**
-   * Node content views use exposed widgets only if AJAX is set.
-   */
-  function uses_exposed() {
-    if ($this->use_ajax()) {
-      return parent::uses_exposed();
-    }
-    return FALSE;
-  }
-
-  /**
    * We have to run token replacement before the arguments are used.
    */
   function pre_execute() {
@@ -268,6 +258,20 @@ class eva_plugin_display_entity extends views_plugin_display {
         $this->view->args = array($entity->{$entity_info['entity keys']['id']});
       }
     }
+  }
+
+  /**
+   * Specify the path of the entity.
+   */
+  function get_path() {
+    if (isset($this->view->current_entity)) {
+      $uri = entity_uri($this->view->display_handler->get_option('entity_type'), $this->view->current_entity);
+      if ($uri) {
+        $uri['options']['absolute'] = TRUE;
+        return url($uri['path'], $uri['options']);
+      }
+    }
+    return parent::get_path();
   }
 
   /**
