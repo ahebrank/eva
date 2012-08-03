@@ -14,7 +14,7 @@ function eva_views_api() {
 
 
 /**
- * Implements hook_content_extra_fields().
+ * Implements hook_field_extra_fields().
  */
 function eva_field_extra_fields() {
   $extras = array();
@@ -22,7 +22,14 @@ function eva_field_extra_fields() {
   
   foreach ($views as $entity => $data) {
     foreach ($data as $view) {
-      foreach ($view['bundles'] as $bundle) {
+      if ($view['bundles']) {
+        $bundles = $view['bundles'];
+      }
+      else {  // If no bundles are set, apply to all bundles.
+        $entity_info = entity_get_info($entity);
+        $bundles = array_keys($entity_info['bundles']);
+      }
+      foreach ($bundles as $bundle) {
         $extras[$entity][$bundle]['display'][$view['name'] . '_' . $view['display']] = array(
           'label' => (empty($view['title'])) ? $view['name'] : $view['title'], 
           'description' => $view['title'], 

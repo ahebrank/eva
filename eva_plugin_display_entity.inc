@@ -51,7 +51,7 @@ class eva_plugin_display_entity extends views_plugin_display {
     $options['bundles'] = array(
       'category' => 'entity_view',
       'title' => t('Bundles'),
-      'value' => empty($bundle_names) ? t('None') : implode(', ', $bundle_names),
+      'value' => empty($bundle_names) ? t('All') : implode(', ', $bundle_names),
     );
 
     $argument_mode = $this->get_option('argument_mode');
@@ -110,7 +110,7 @@ class eva_plugin_display_entity extends views_plugin_display {
         $form['#title'] .= t('Bundles');
         $form['bundles'] = array(
           '#type' => 'checkboxes',
-          '#title' => t("Attach this display to the following bundles"),
+          '#title' => t("Attach this display to the following bundles.  If no bundles are selected, the display will be attached to all."),
           '#options' => $options,
           '#default_value' => $this->get_option('bundles'),
         );
@@ -219,12 +219,6 @@ class eva_plugin_display_entity extends views_plugin_display {
     if (empty($entity_type)) {
       $errors[] = t('Display @display must have an entity type selected.', array('@display' => $this->display->display_title));
     }
-
-    $bundles = $this->get_option('bundles');
-    if (empty($bundles)) {
-      $errors[] = t('Display @display must have at least one bundle selected.', array('@display' => $this->display->display_title));
-    }
-
     return $errors;
   }
 
