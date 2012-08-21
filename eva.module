@@ -36,7 +36,7 @@ function eva_field_extra_fields() {
           'weight' => 10,
         );
         // Provide a separate extra field for the exposed form if there is any.
-        if ($view['exposed form']) {
+        if ($view['exposed form'] && $view['exposed form split']) {
           $extras[$entity][$bundle]['display'][$view['name'] . '_' . $view['display'] . '_' . 'form'] = array(
             'label' => ((empty($view['title'])) ? $view['name'] : $view['title']) . ' (' . t('Exposed form') . ')', 
             'description' => t('The exposed filter form of the view.'),
@@ -146,6 +146,7 @@ function eva_get_views($type = NULL, $reset = FALSE) {
           'display' => $display_id,
           'bundles' => $view->display_handler->get_option('bundles'),
           'exposed form' => $view->display_handler->uses_exposed(),
+          'exposed form split' => $view->display_handler->get_option('exposed_form_as_field'),
         );
         $view->destroy();
       }
