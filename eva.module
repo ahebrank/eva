@@ -129,6 +129,7 @@ function eva_get_views($type = NULL, $reset = FALSE) {
 
     // If it's still empty rebuild it.
     if (!isset($used_views)) {
+      $used_views = array();
       // Trigger a rebuild of the views object cache, which may not be fully loaded.
       ctools_include('export');
       ctools_export_load_object_reset('views_view');
