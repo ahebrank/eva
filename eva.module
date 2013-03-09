@@ -12,7 +12,6 @@ function eva_views_api() {
   );
 }
 
-
 /**
  * Implements hook_field_extra_fields().
  */
@@ -20,25 +19,26 @@ function eva_field_extra_fields() {
   $extras = array();
   $views = eva_get_views();
   
+  //exit("<pre>" . var_export($views, TRUE) . "</pre>");
+  
   foreach ($views as $entity => $data) {
     foreach ($data as $view) {
       if ($view['bundles']) {
         $bundles = $view['bundles'];
       }
       else {  // If no bundles are set, apply to all bundles.
-        $entity_info = entity_get_info($entity);
-        $bundles = array_keys($entity_info['bundles']);
+        $bundles = array_keys(entity_get_bundles($entity));
       }
       foreach ($bundles as $bundle) {
-        $extras[$entity][$bundle]['display'][$view['name'] . '_' . $view['display']] = array(
-          'label' => (empty($view['title'])) ? $view['name'] : $view['title'], 
-          'description' => $view['title'], 
+        $extras[$entity][$bundle]['display'][$view['id'] . '_' . $view['display']] = array(
+          'label' => (empty($view['title'])) ? $view['id'] : $view['title'],
+          'description' => $view['title'],
           'weight' => 10,
         );
         // Provide a separate extra field for the exposed form if there is any.
         if (!empty($view['exposed form']) && !empty($view['exposed form split'])) {
           $extras[$entity][$bundle]['display'][$view['name'] . '_' . $view['display'] . '_' . 'form'] = array(
-            'label' => ((empty($view['title'])) ? $view['name'] : $view['title']) . ' (' . t('Exposed form') . ')', 
+            'label' => ((empty($view['title'])) ? $view['name'] : $view['title']) . ' (' . t('Exposed form') . ')',
             'description' => t('The exposed filter form of the view.'),
             'weight' => 9,
           );
@@ -69,9 +69,9 @@ function eva_entity_view_alter(&$build, $type) {
   $settings = field_view_mode_settings($type, $entity_ids[2]);
   $fields = field_extra_fields_get_display($type, $entity_ids[2], $view_mode);
   $views = eva_get_views($type);
-
+  
   foreach ($views as $info) {
-    $longname = $info['name'] .'_'. $info['display'];
+    $longname = $info['name'] . '_' . $info['display'];
     if (isset($fields[$longname]) && $fields[$longname]['visible']) {
       if ($view = views_get_view($info['name'])) {
         $view->set_display($info['display']);
@@ -116,45 +116,24 @@ function eva_entity_view_alter(&$build, $type) {
 function eva_get_views($type = NULL, $reset = FALSE) {
   $used_views = &drupal_static(__FUNCTION__);
 
-  if (!isset($used_views) || $reset) {
-    views_include('cache');
-    
-    // If we're not resetting, check the Views cache.
-    if (!$reset) {
-      $cache = views_cache_get("eva");
-      if (isset($cache->data)) {
-        $used_views = $cache->data;
-      }
-    }
-
-    // If it's still empty rebuild it.
-    if (!isset($used_views)) {
-      $used_views = array();
-      // Trigger a rebuild of the views object cache, which may not be fully loaded.
-      ctools_include('export');
-      ctools_export_load_object_reset('views_view');
-
-      // Build and cache the data, both in the DB and statically.
-      $views = views_get_applicable_views('uses hook entity view');
-      foreach ($views as $data) {
-        list($view, $display_id) = $data;
-        $view_entity = $view->display_handler->get_option('entity_type');
-        // Initialize handlers, to determine if the view uses exposed filters.
-        $view->init_handlers();
-        $used_views[$view_entity][] = array(
-          'name' => $view->name,
-          'title' => 'EVA: ' . $view->get_human_name() . ' - ' . $view->display[$display_id]->display_title,
-          'display' => $display_id,
-          'bundles' => $view->display_handler->get_option('bundles'),
-          'exposed form' => $view->display_handler->uses_exposed(),
-          'exposed form split' => $view->display_handler->get_option('exposed_form_as_field'),
-        );
-        $view->destroy();
-      }
-      views_cache_set("eva", $used_views);
-    }
+  // Build and cache the data, both in the DB and statically.
+  $views = views_get_applicable_views('uses_hook_entity_view');
+  foreach ($views as $data) {
+    list($view, $display_id) = $data;
+    // Initialize handlers, to determine if the view uses exposed filters.
+    $view->initHandlers();
+    $view_entity = $view->display_handler->getOption('entity_type');
+    debug($view->display_handler->getOption('entity_type'));
+    $used_views[$view_entity][] = array(
+      'id' => $view->storage->get('id'),
+      'title' => 'EVA: ' . $view->storage->get('human_name') . ' - ',
+      'display' => $display_id,
+      'bundles' => $view->display_handler->getOption('bundles'),
+      'exposed form' => $view->display_handler->usesExposed(),
+      'exposed form split' => $view->display_handler->getOption('exposed_form_as_field'),
+    );
+    $view->destroy();
   }
-
   // Now spit back the data.
   if (isset($type) & isset($used_views)) {
     return isset($used_views[$type]) ? $used_views[$type] : array();
@@ -183,7 +162,7 @@ function _eva_extract_entity_from_build($build) {
   if (!empty($build['#entity'])) {
     return $build['#entity'];
   }
-  
+
   // Other entities stick them here!
   elseif (!empty($build['#' . $build['#entity_type']])) {
     return $build['#' . $build['#entity_type']];
