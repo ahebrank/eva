@@ -145,7 +145,7 @@ class eva_plugin_display_entity extends views_plugin_display {
           '#collapsible' => TRUE,
           '#states' => array(
             'visible' => array(
-              'input:[name=argument_mode]' => array('value' => 'token'),
+              ':input[name=argument_mode]' => array('value' => 'token'),
             ),
           ),
         );
