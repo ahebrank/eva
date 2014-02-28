@@ -22,10 +22,11 @@ function eva_field_extra_fields() {
   
   foreach ($views as $entity => $data) {
     foreach ($data as $view) {
-      if ($view['bundles']) {
+      if (!empty($view['bundles'])) {
         $bundles = $view['bundles'];
       }
-      else {  // If no bundles are set, apply to all bundles.
+      // If no bundles are set, apply to all bundles.
+      else {
         $entity_info = entity_get_info($entity);
         $bundles = array_keys($entity_info['bundles']);
       }
