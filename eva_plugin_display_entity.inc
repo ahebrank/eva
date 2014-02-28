@@ -67,7 +67,7 @@ class eva_plugin_display_entity extends views_plugin_display {
       'title' => t('Show title'),
       'value' => $this->get_option('show_title') ? t('Yes') : t('No'),
     );
-    
+
     $options['exposed_form_as_field'] = array(
       'category' => 'entity_view',
       'title' => t('Exposed Form as Field'),
@@ -88,12 +88,13 @@ class eva_plugin_display_entity extends views_plugin_display {
   function options_form(&$form, &$form_state) {
     // It is very important to call the parent function here:
     parent::options_form($form, $form_state);
-    
+
     $entity_info = entity_get_info();
     $entity_type = $this->get_option('entity_type');
 
     switch ($form_state['section']) {
       case 'entity_type':
+        $entity_names = array();
         foreach ($entity_info as $type => $info) {
           if (!empty($info['view modes'])) {
             $entity_names[$type] = $info['label'];
@@ -111,6 +112,7 @@ class eva_plugin_display_entity extends views_plugin_display {
         break;
 
       case 'bundles':
+        $options = array();
         foreach ($entity_info[$entity_type]['bundles'] as $bundle => $info) {
           $options[$bundle] = $info['label'];
         }
@@ -200,7 +202,7 @@ class eva_plugin_display_entity extends views_plugin_display {
           // only one on the new type, we can select it automatically. Otherwise
           // we need to wipe the options and start over.
           $new_entity_info = entity_get_info($new_entity);
-          
+
           $new_bundle_keys = array_keys($new_entity_info['bundles']);
           $new_bundles = array();
           if (count($new_bundle_keys) == 1) {
@@ -227,7 +229,7 @@ class eva_plugin_display_entity extends views_plugin_display {
       case 'exposed_form_as_field':
         $this->set_option('exposed_form_as_field', $form_state['values']['exposed_form_as_field']);
         break;
-      
+
     }
   }
 
@@ -252,7 +254,7 @@ class eva_plugin_display_entity extends views_plugin_display {
       $entity = $this->view->current_entity;
       $entity_type = $this->view->display_handler->get_option('entity_type');
       $entity_info = entity_get_info($entity_type);
-  
+
       $arg_mode = $this->view->display_handler->get_option('argument_mode');
       if ($arg_mode == 'token') {
         if ($token_string = $this->view->display_handler->get_option('default_argument')) {
@@ -263,7 +265,7 @@ class eva_plugin_display_entity extends views_plugin_display {
           foreach ($token_values as $key => $value) {
             $new_args[$key] = $value;
           }
-  
+
           $this->view->args = $new_args;
         }
       }
@@ -302,4 +304,5 @@ class eva_plugin_display_entity extends views_plugin_display {
       return $data;
     }
   }
+
 }
