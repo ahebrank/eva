@@ -60,7 +60,6 @@ function eva_field_extra_fields() {
  */
 function eva_entity_view_alter(&$build, $type) {
   $view_mode = $build['#view_mode'];
-  $language = $build['#language'];
 
   $entity_data = entity_get_info($type);
   $entity = _eva_extract_entity_from_build($build, $type);
