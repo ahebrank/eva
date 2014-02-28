@@ -63,7 +63,7 @@ function eva_entity_view_alter(&$build, $type) {
   $language = $build['#language'];
 
   $entity_data = entity_get_info($type);
-  $entity = _eva_extract_entity_from_build($build);
+  $entity = _eva_extract_entity_from_build($build, $type);
 
   $entity_ids = entity_extract_ids($type, $entity);
   $settings = field_view_mode_settings($type, $entity_ids[2]);
@@ -173,12 +173,12 @@ function eva_get_views($type = NULL, $reset = FALSE) {
  *
  * @param $build
  *   The token string defined by the view.
- * @param $entity_data
- *   The token type.
+ * @param string $entity_type
+ *   (optional) The entity type. Defaults to NULL.
  *
  * I hate you, Milkman Dan.
  */
-function _eva_extract_entity_from_build($build) {
+function _eva_extract_entity_from_build($build, $entity_type = NULL) {
   // EntityAPI often sticks stuff in here.
   if (!empty($build['#entity'])) {
     return $build['#entity'];
@@ -187,6 +187,9 @@ function _eva_extract_entity_from_build($build) {
   // Other entities stick them here!
   elseif (!empty($build['#' . $build['#entity_type']])) {
     return $build['#' . $build['#entity_type']];
+  }
+  elseif ($entity_type && !empty($build['#' . $entity_type])) {
+    return $build['#' . $entity_type];
   }
 
   // Some entities are naughty.
