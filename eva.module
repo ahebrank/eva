@@ -75,7 +75,7 @@ function eva_entity_view_alter(&$build, $type) {
   foreach ($views as $info) {
     $longname = $info['name'] . '_' . $info['display'];
     if (isset($fields[$longname]) && $fields[$longname]['visible']) {
-      _eva_build_extra_fields($build, $entity, $fields, $info['name'], $info['display'], 'display');
+      _eva_build_extra_fields($build, $type, $entity, $fields, $info['name'], $info['display'], 'display');
     }
   }
 }
@@ -100,7 +100,7 @@ function eva_field_attach_form($entity_type, $entity, &$form, &$form_state, $lan
   // added to the form.
   foreach ($views as $info) {
     if (isset($fields[$info['name'] . '_' . $info['display']])) {
-      _eva_build_extra_fields($form, $entity, $fields, $info['name'], $info['display'], 'form');
+      _eva_build_extra_fields($form, $entity_type, $entity, $fields, $info['name'], $info['display'], 'form');
     }
   }
 }
@@ -110,6 +110,8 @@ function eva_field_attach_form($entity_type, $entity, &$form, &$form_state, $lan
  *
  * @param array $build
  *   The rendered entity or the entity form.
+ * @param string $entity_type
+ *   The entity type.
  * @param object $entity
  *   The entity object. This is used by the display plugin for processing.
  * @param array $fields
@@ -121,7 +123,7 @@ function eva_field_attach_form($entity_type, $entity, &$form, &$form_state, $lan
  * @param string $context
  *   Where this EVA is being used, either 'form' or 'display'.
  */
-function _eva_build_extra_fields(&$build, $entity, $fields, $name, $display_id, $context) {
+function _eva_build_extra_fields(&$build, $entity_type, $entity, $fields, $name, $display_id, $context) {
   if ($view = views_get_view($name)) {
     $view->set_display($display_id);
     if ($view->access($display_id)) {
@@ -136,7 +138,30 @@ function _eva_build_extra_fields(&$build, $entity, $fields, $name, $display_id, 
           '#markup' => $exposed_form->render_exposed_form(TRUE),
         );
       }
-      $result = $view->execute_display($display_id);
+
+      $arg_mode = $view->display_handler->get_option('argument_mode');
+      if ($arg_mode == 'token') {
+        $args = array();
+        if ($token_string = $view->display_handler->get_option('default_argument')) {
+          // Now do the token replacement.
+          $token_values = eva_get_arguments_from_token_string($token_string, $entity_type, $entity);
+          // We have to be careful to only replace arguments that have tokens.
+          foreach ($token_values as $key => $value) {
+            $args[$key] = $value;
+          }
+        }
+      }
+      elseif ($arg_mode == 'id') {
+        list($id,,) = entity_extract_ids($entity_type, $entity);
+        $args = array($id);
+      }
+      else {
+        // We should not get here, but if we are, prevent notices.
+        $args = array();
+      }
+
+
+      $result = $view->execute_display($display_id, $args);
       if (!empty($result)) {
         $build[$longname] = array(
           '#markup' => $result,

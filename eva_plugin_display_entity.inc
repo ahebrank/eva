@@ -281,38 +281,6 @@ class eva_plugin_display_entity extends views_plugin_display {
   }
 
   /**
-   * We have to run token replacement before the arguments are used.
-   */
-  function pre_execute() {
-    // Call the parent setup function so we do not lose data.
-    parent::pre_execute();
-
-    if (isset($this->view->current_entity)) {
-      $entity = $this->view->current_entity;
-      $entity_type = $this->view->display_handler->get_option('entity_type');
-      $entity_info = entity_get_info($entity_type);
-
-      $arg_mode = $this->view->display_handler->get_option('argument_mode');
-      if ($arg_mode == 'token') {
-        if ($token_string = $this->view->display_handler->get_option('default_argument')) {
-          // Now do the token replacement.
-          $token_values = eva_get_arguments_from_token_string($token_string, $entity_type, $entity);
-          $new_args = array();
-          // We have to be careful to only replace arguments that have tokens.
-          foreach ($token_values as $key => $value) {
-            $new_args[$key] = $value;
-          }
-
-          $this->view->args = $new_args;
-        }
-      }
-      elseif ($arg_mode == 'id' && isset($entity->{$entity_info['entity keys']['id']})) {
-        $this->view->args = array($entity->{$entity_info['entity keys']['id']});
-      }
-    }
-  }
-
-  /**
    * Specify the path of the entity.
    */
   function get_path() {
