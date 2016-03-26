@@ -1,8 +1,7 @@
 name: Eva
 description: Provides a Views display type that can be attached to entities.
 core: 8.x
+type: module
 dependencies:
   - views
-package: Views
-files:
-  - eva_plugin_display_entity.inc
+package: Field types
