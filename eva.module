@@ -40,9 +40,6 @@ function eva_entity_extra_field_info() {
     }
   }
 
-  // print_r($views);
-  //print_r($extra); exit();
-
   return $extra;
 }
 
