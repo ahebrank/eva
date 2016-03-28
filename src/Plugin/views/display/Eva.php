@@ -98,12 +98,6 @@ class Eva extends DisplayPluginBase {
       'title' => t('Show title'),
       'value' => $this->getOption('show_title') ? t('Yes') : t('No'),
     );
-
-    $options['exposed_form_as_field'] = array(
-      'category' => 'entity_view',
-      'title' => t('Exposed Form as Field'),
-      'value' => $this->getOption('exposed_form_as_field') ? t('Yes') : t('No'),
-    );
   }
 
   /**
@@ -190,14 +184,6 @@ class Eva extends DisplayPluginBase {
           '#default_value' => $this->getOption('show_title'),
         );
         break;
-      case 'exposed_form_as_field':
-        $form['#title'] .= t('Exposed Form as Field');
-        $form['exposed_form_as_field'] = array(
-          '#type' => 'checkbox',
-          '#title' => t('Split off Exposed Form as Separate Field'),
-          '#default_value' => $this->getOption('exposed_form_as_field'),
-          '#description' => t('Check this box to have a separate field for this view\'s exposed form on the "Manage Display" tab'),
-        );
     }
   }
 
@@ -248,9 +234,6 @@ class Eva extends DisplayPluginBase {
         break;
       case 'show_title':
         $this->setOption('show_title', $form_state->getValue('show_title'));
-        break;
-      case 'exposed_form_as_field':
-        $this->setOption('exposed_form_as_field', $form_state->getValue('exposed_form_as_field'));
         break;
     }
   }

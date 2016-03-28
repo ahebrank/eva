@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Utility\Token;
+use Drupal\Core\modules\field\field;
 
 /**
  * Implements hook_entity_extra_field_info() to add the view fields to relevant entities
@@ -28,7 +29,7 @@ function eva_entity_extra_field_info() {
           'weight' => 10,
         );
         // Provide a separate extra field for the exposed form if there is any.
-        if ($view['exposed form']) {
+        if ($view['uses exposed']) {
           $extra[$entity][$bundle]['display'][$view['name'] . '_' . $view['display'] . '_' . 'form'] = array(
             'label' => ((empty($view['title'])) ? $view['name'] : $view['title']) . ' (' . t('Exposed form') . ')', 
             'description' => t('The exposed filter form of the view.'),
@@ -38,6 +39,9 @@ function eva_entity_extra_field_info() {
       }
     }
   }
+
+  // print_r($views);
+  //print_r($extra); exit();
 
   return $extra;
 }
@@ -61,13 +65,15 @@ function eva_get_views($type = NULL, $reset = FALSE) {
   // Build and cache the data, both in the DB and statically.
   $views = Views::getApplicableViews('uses_hook_entity_view');
 
+  $used_views = array();
   foreach ($views as $data) {
     list($view_name, $display_id) = $data;
     $view = Views::getView($view_name);
 
     // Initialize handlers, to determine if the view uses exposed filters.
+    $view->setDisplay($display_id);
     $view->initHandlers();
-    $display = $view->displayHandlers->get($display_id);
+    $display = $view->display_handler;
 
     $view_entity = $display->getOption('entity_type');
     $used_views[$view_entity][] = array(
@@ -76,18 +82,15 @@ function eva_get_views($type = NULL, $reset = FALSE) {
       'title' => 'EVA: ' . $view->storage->get('label') . ' - ' . $view->storage->getDisplay($display_id)['display_title'],
       'display' => $display_id,
       'bundles' => $display->getOption('bundles'),
-      'exposed form' => $display->usesExposed(),
-      'exposed form split' => $display->getOption('exposed_form_as_field'),
+      'uses exposed' => $display->usesExposed(),
     );
     $view->destroy();
   }
-  // Now spit back the data.
-  if (isset($type) & isset($used_views)) {
+
+  if (!is_null($type)) {
     return isset($used_views[$type]) ? $used_views[$type] : array();
   }
-  else {
-    return isset($used_views) ? $used_views : array();
-  }
+  return $used_views;
 }
 
 /**
@@ -112,9 +115,7 @@ function eva_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
             $view->initHandlers();
             $exposed_form = $view->display_handler->getPlugin('exposed_form');
 
-            $build[$longname . '_form'] = array(
-              '#markup' => $exposed_form->renderExposedForm($block = TRUE),
-            );
+            $build[$longname . '_form'] = $exposed_form->renderExposedForm($block = TRUE);
           }
 
           $element = $view->executeDisplay($info['display']);
@@ -171,17 +172,16 @@ function eva_modules_disabled($modules) {
  */
 function _eva_reset() {
   drupal_static_reset('eva_get_views');
-  \Drupal::cache('views')->deleteAll();
+  \Drupal::cache('render')->deleteAll();
 }
 
 /**
- * Clear the field cache when views are saved. This will make sure newly
- * created EVA views and/or exposed filters will appear.
+ * Clear the field cache when view cache clears
  */
-function eva_form_views_ui_edit_form_alter(&$form, &$form_state, $form_id) {
-  $form['actions']['save']["#submit"][] = 'field_cache_clear';
+function eva_views_invalidate_cache() {
+  // see https://www.drupal.org/node/2281897
+  \Drupal::entityManager()->clearCachedFieldDefinitions();
 }
-
 
 /**
  * templating preprocessing
