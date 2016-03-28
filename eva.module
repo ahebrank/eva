@@ -9,6 +9,7 @@ use Drupal\views\Views;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Utility\Token;
 
 /**
  * Implements hook_entity_extra_field_info() to add the view fields to relevant entities
@@ -58,7 +59,7 @@ function eva_entity_extra_field_info() {
  */
 function eva_get_views($type = NULL, $reset = FALSE) {
   // Build and cache the data, both in the DB and statically.
-  $views = \Drupal\views\Views::getApplicableViews('uses_hook_entity_view');
+  $views = Views::getApplicableViews('uses_hook_entity_view');
 
   foreach ($views as $data) {
     list($view_name, $display_id) = $data;
@@ -103,15 +104,16 @@ function eva_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
       if ($view = Views::getView($info['name'])) {
         $view->setDisplay($info['display']);
         if ($view->access($info['display'])) {
+          // no parent for current_entity; it's used by the display's preExecute
           $view->current_entity = $entity;
 
           // exposed form
           if (isset($fields[$longname . '_form']) && $fields[$longname . '_form']['visible']) {
-            $view->init_handlers();
-            $exposed_form = $view->display_handler->get_plugin('exposed_form');
+            $view->initHandlers();
+            $exposed_form = $view->display_handler->getPlugin('exposed_form');
 
             $build[$longname . '_form'] = array(
-              '#markup' => $exposed_form->render_exposed_form(TRUE),
+              '#markup' => $exposed_form->renderExposedForm($block = TRUE),
             );
           }
 
@@ -138,15 +140,13 @@ function eva_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
  *   The object being used for replacement data (typically a node).
  * @return
  *   An array of argument values.
- *
- * @todo: security?
  */
 function eva_get_arguments_from_token_string($string, $type, $object) {
   $args = trim($string);
   if (empty($args)) {
     return array();
   }
-  $args = token_replace($args, array($type => $object), array('sanitize' => FALSE));
+  $args = Token::replace($args, array($type => $object), array('sanitize' => FALSE));
   return explode('/', $args);
 }
 
@@ -154,34 +154,38 @@ function eva_get_arguments_from_token_string($string, $type, $object) {
  * Implements hook_modules_enabled().
  */
 function eva_modules_enabled($modules) {
-  // Reset the static cache in case any of the enabled modules
-  // implement an eva view
-  drupal_static_reset('eva_get_views');
-  cache_clear_all('*', 'cache_views', TRUE);
+  _eva_reset();
 }
 
 /**
  * Implements hook_modules_disabled().
  */
 function eva_modules_disabled($modules) {
-  // Reset the static cache in case any of the disabled modules
-  // implemented an eva view
-  drupal_static_reset('eva_get_views');
-  cache_clear_all('*', 'cache_views', TRUE);
+  _eva_reset();
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
+ * Cache clearing helper function
+ * Reset the static cache in case any of the disabled modules
+ * implemented an eva view
+ */
+function _eva_reset() {
+  drupal_static_reset('eva_get_views');
+  \Drupal::cache('views')->deleteAll();
+}
+
+/**
+ * Clear the field cache when views are saved. This will make sure newly
+ * created EVA views and/or exposed filters will appear.
  */
 function eva_form_views_ui_edit_form_alter(&$form, &$form_state, $form_id) {
-  // Clear the field cache when views are saved. This will make sure newly
-  // created EVA views and/or exposed filters will appear.
   $form['actions']['save']["#submit"][] = 'field_cache_clear';
 }
 
 
 /**
- * templating functions
+ * templating preprocessing
+ * figure out the title and whether there's an exposed form
  */
 function template_preprocess_eva_display_entity_view(&$vars) {
   $view = $vars['view'];
