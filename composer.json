@@ -1,0 +1,30 @@
+{
+    "name": "ahebrank/eva",
+    "type": "drupal-module",
+    "description": "Attach a view to an entity",
+    "keywords": ["entity","views","attachment","field"],
+    "homepage": "https://github.com/ahebrank/eva",
+    "authors": [
+        {
+            "name": "Jeff Eaton",
+            "homepage": "http://drupal.org/user/16496"
+        },
+        {
+            "name": "Larry Garfield",
+            "homepage": "http://drupal.org/user/26398"
+        },
+        {
+            "name": "Mike Kadin",
+            "homepage": "https://www.drupal.org/u/mkadin"
+        },
+        {
+            "name": "Andy Hebrank",
+            "email": "ahebrank@gmail.com",
+            "homepage": "https://www.drupal.org/u/ahebrank"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/ahebrank/eva/issues",
+        "source": "https://github.com/ahebrank/eva"
+      }
+}
