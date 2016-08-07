@@ -128,6 +128,8 @@ function _eva_build_extra_fields(&$build, $entity_type, $entity, $fields, $name,
     $view->set_display($display_id);
     if ($view->access($display_id)) {
       $view->current_entity = $entity;
+      $view->current_entity_type = $entity_type;
+      $view->current_entity_view_mode = ($context === 'form') ? 'form' : $build['#view_mode'];
 
       $longname = $name . '_' . $display_id;
       if ($context == 'display' && isset($fields[$longname . '_form'])) {
