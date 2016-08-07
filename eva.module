@@ -261,7 +261,8 @@ function _eva_extract_entity_from_build($build, $entity_type = NULL) {
   }
 
   // Other entities stick them here!
-  elseif (!empty($build['#' . $build['#entity_type']])) {
+  // @todo This might be obsolete, eva_entity_view_alter sets $entity_type.
+  elseif (!empty($build['#entity_type']) && !empty($build['#' . $build['#entity_type']])) {
     return $build['#' . $build['#entity_type']];
   }
   elseif ($entity_type && !empty($build['#' . $entity_type])) {
