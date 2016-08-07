@@ -284,6 +284,10 @@ class eva_plugin_display_entity extends views_plugin_display {
    * Specify the path of the entity.
    */
   function get_path() {
+    if (($path = parent::get_path())) {
+      return $path;
+    }
+
     if (isset($this->view->current_entity)) {
       $uri = entity_uri($this->view->display_handler->get_option('entity_type'), $this->view->current_entity);
       if ($uri) {
@@ -291,7 +295,6 @@ class eva_plugin_display_entity extends views_plugin_display {
         return url($uri['path'], $uri['options']);
       }
     }
-    return parent::get_path();
   }
 
   /**
