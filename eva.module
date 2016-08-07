@@ -302,7 +302,7 @@ function eva_get_arguments_from_token_string($string, $type, $object) {
   if (empty($args)) {
     return array();
   }
-  $args = token_replace($args, array($type => $object), array('sanitize' => FALSE));
+  $args = token_replace($args, array($type => $object), array('sanitize' => FALSE, 'clear' => TRUE));
   return explode('/', $args);
 }
 
