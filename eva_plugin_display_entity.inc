@@ -4,6 +4,10 @@
  * The plugin that handles entity-attached views.
  */
 class eva_plugin_display_entity extends views_plugin_display {
+
+  /**
+   * {@inheritdoc}
+   */
   function option_definition() {
     $options = parent::option_definition();
 
@@ -13,6 +17,7 @@ class eva_plugin_display_entity extends views_plugin_display {
     $options['default_argument'] = array('default' => '');
     $options['show_title'] = 0;
     $options['exposed_form_as_field'] = 0;
+    $options['show_on'] = array('default' => 'display');
 
     return $options;
   }
@@ -53,6 +58,12 @@ class eva_plugin_display_entity extends views_plugin_display {
       'category' => 'entity_view',
       'title' => t('Bundles'),
       'value' => empty($bundle_names) ? t('All') : implode(', ', $bundle_names),
+    );
+
+    $options['show_on'] = array(
+      'category' => 'entity_view',
+      'title' => t('Show on'),
+      'value' => $this->get_option('show_on'),
     );
 
     $argument_mode = $this->get_option('argument_mode');
@@ -125,6 +136,21 @@ class eva_plugin_display_entity extends views_plugin_display {
         );
         break;
 
+      case 'show_on':
+        $form['#title'] .= t('Show on');
+        $form['show_on'] = array(
+          '#type' => 'select',
+          '#title' => t('Where to show this view'),
+          '#description' => t('This view can be used on either the entity display or on the entity form. When shown on a form, the exposed filters will be hidden.'),
+          '#options' => array(
+            'display' => t('Display'),
+            'form' => t('Form'),
+          ),
+          '#required' => TRUE,
+          '#default_value' => $this->get_option('show_on'),
+        );
+        break;
+
       case 'arguments':
         $form['#title'] .= t('Arguments');
         $default = $this->get_option('argument_mode');
@@ -181,12 +207,15 @@ class eva_plugin_display_entity extends views_plugin_display {
           '#type' => 'checkbox',
           '#title' => t('Split off Exposed Form as Separate Field'),
           '#default_value' => $this->get_option('exposed_form_as_field'),
-          '#description' => t('Check this box to have a separate field for this view\'s exposed form on the "Manage Display" tab'),
+          '#description' => t('Check this box to have a separate field for this view\'s exposed form on the "Manage Display" tab. This is not available to EVAs attached to the form.'),
         );
     }
 
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function options_submit(&$form, &$form_state) {
     // It is very important to call the parent function here:
     parent::options_submit($form, $form_state);
@@ -214,6 +243,11 @@ class eva_plugin_display_entity extends views_plugin_display {
       case 'bundles':
         $this->set_option('bundles', array_values(array_filter($form_state['values']['bundles'])));
         break;
+
+      case 'show_on':
+        $this->set_option('show_on', $form_state['values']['show_on']);
+        break;
+
       case 'arguments':
         $this->set_option('argument_mode', $form_state['values']['argument_mode']);
         if ($form_state['values']['argument_mode'] == 'token') {
@@ -233,6 +267,9 @@ class eva_plugin_display_entity extends views_plugin_display {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function validate() {
     $errors = parent::validate();
 
@@ -269,7 +306,7 @@ class eva_plugin_display_entity extends views_plugin_display {
           $this->view->args = $new_args;
         }
       }
-      elseif ($arg_mode == 'id') {
+      elseif ($arg_mode == 'id' && isset($entity->{$entity_info['entity keys']['id']})) {
         $this->view->args = array($entity->{$entity_info['entity keys']['id']});
       }
     }
