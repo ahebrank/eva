@@ -55,27 +55,27 @@ function eva_field_extra_fields() {
 /**
  * Implements hook_entity_view_alter().
  */
-function eva_entity_view_alter(&$build, $type) {
+function eva_entity_view_alter(&$build, $entity_type) {
   // If we cannot find the entity, return.
-  if (!$entity = _eva_extract_entity_from_build($build, $type)) {
+  if (!$entity = _eva_extract_entity_from_build($build, $entity_type)) {
     return;
   }
 
   // If there are no extra fields for this view mode, return.
-  list(, , $bundle) = entity_extract_ids($type, $entity);
-  if (!$fields = field_extra_fields_get_display($type, $bundle, $build['#view_mode'])) {
+  list(, , $bundle) = entity_extract_ids($entity_type, $entity);
+  if (!$fields = field_extra_fields_get_display($entity_type, $bundle, $build['#view_mode'])) {
     return;
   }
 
   // If there are no views for this entity type, return.
-  if (!$views = eva_get_views($type)) {
+  if (!$views = eva_get_views($entity_type)) {
     return;
   }
 
   foreach ($views as $info) {
     $longname = $info['name'] . '_' . $info['display'];
     if (isset($fields[$longname]) && $fields[$longname]['visible']) {
-      _eva_build_extra_fields($build, $type, $entity, $fields, $info['name'], $info['display'], 'display');
+      _eva_build_extra_fields($build, $entity_type, $entity, $fields, $info['name'], $info['display'], 'display');
     }
   }
 }
