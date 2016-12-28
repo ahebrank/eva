@@ -2,7 +2,7 @@
 /**
  * @file
  * eva theme implementation for main view template.
- * 
+ *
  * the main difference between this and the canonical template
  * is the exposed form is removed (because it is displayed as
  * a separate field)
@@ -38,6 +38,11 @@
 #}
 {%
   set classes = [
+    'view',
+    'view-eva',
+    'view-' ~ id|clean_class,
+    'view-id-' ~ id,
+    'view-display-id-' ~ display_id,
     dom_id ? 'js-view-dom-id-' ~ dom_id,
   ]
 %}
