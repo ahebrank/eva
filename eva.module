@@ -9,6 +9,7 @@ use Drupal\views\Views;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Component\Utility\Xss;
+use Drupal\Component\Utility\Html;
 
 /**
  * Implements hook_entity_extra_field_info() to add the view fields to relevant entities
@@ -24,14 +25,14 @@ function eva_entity_extra_field_info() {
       $bundles = !empty($view['bundles'])? $view['bundles'] : array_keys(\Drupal::service('entity_type.bundle.info')->getBundleInfo($entity));
       foreach ($bundles as $bundle) {
         $extra[$entity][$bundle]['display'][$view['name'] . '_' . $view['display']] = array(
-          'label' => (empty($view['title'])) ? $view['name'] : $view['title'], 
-          'description' => $view['title'], 
+          'label' => (empty($view['title'])) ? $view['name'] : $view['title'],
+          'description' => $view['title'],
           'weight' => 10,
         );
         // Provide a separate extra field for the exposed form if there is any.
         if ($view['uses exposed']) {
           $extra[$entity][$bundle]['display'][$view['name'] . '_' . $view['display'] . '_' . 'form'] = array(
-            'label' => ((empty($view['title'])) ? $view['name'] : $view['title']) . ' (' . t('Exposed form') . ')', 
+            'label' => ((empty($view['title'])) ? $view['name'] : $view['title']) . ' (' . t('Exposed form') . ')',
             'description' => t('The exposed filter form of the view.'),
             'weight' => 9,
           );
@@ -190,8 +191,19 @@ function template_preprocess_eva_display_entity_view(&$variables) {
   $display = $view->display_handler;
   $variables['title'] = $display->getOption('show_title') ? Xss::filterAdmin($view->getTitle()) : '';
   $variables['exposed_form_as_field'] = $display->getOption('exposed_form_as_field');
-  // inject the dom ID since this isn't done automatically
+
+  $id = $view->storage->id();
+  $variables['css_name'] = Html::cleanCssIdentifier($id);
+  $variables['id'] = $id;
+  $variables['display_id'] = $view->current_display;
   $variables['dom_id'] = $view->dom_id;
+  
+  // pull in the display class
+  $css_class = $view->display_handler->getOption('css_class');
+  if (!empty($css_class)) {
+    $variables['css_class'] = preg_replace('/[^a-zA-Z0-9- ]/', '-', $css_class);
+    $variables['attributes']['class'][] = $variables['css_class'];
+  }
 
   $variables['view_array']['#view_id'] = $view->storage->id();
   $variables['view_array']['#view_display_show_admin_links'] = $view->getShowAdminLinks();
