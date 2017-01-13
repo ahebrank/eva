@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\eva\Plugin\views\display\Eva.
- */
-
 namespace Drupal\eva\Plugin\views\display;
 
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
