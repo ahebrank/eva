@@ -115,7 +115,7 @@ function eva_entity_view(array &$build, EntityInterface $entity, EntityViewDispl
             $build[$longname . '_form'] = $exposed_form->renderExposedForm(TRUE);
           }
 
-          $element = $view->executeDisplay($info['display']);
+          $element = $view->buildRenderable($info['display']);
 
           if (!empty($element)) {
             $build[$longname][] = $element;
