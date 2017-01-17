@@ -28,6 +28,7 @@ function eva_entity_extra_field_info() {
           'label' => (empty($view['title'])) ? $view['name'] : $view['title'],
           'description' => $view['title'],
           'weight' => 10,
+          'visible' => FALSE,
         );
         // Provide a separate extra field for the exposed form if there is any.
         if ($view['uses exposed']) {
@@ -35,6 +36,7 @@ function eva_entity_extra_field_info() {
             'label' => ((empty($view['title'])) ? $view['name'] : $view['title']) . ' (' . t('Exposed form') . ')',
             'description' => t('The exposed filter form of the view.'),
             'weight' => 9,
+            'visible' => FALSE,
           );
         }
       }
