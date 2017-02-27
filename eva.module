@@ -104,7 +104,7 @@ function eva_entity_view(array &$build, EntityInterface $entity, EntityViewDispl
     if ($display->getComponent($longname)) {
       if ($view = Views::getView($info['name'])) {
         $view->setDisplay($info['display']);
-        if ($view->access($info['display'])) {
+        if ((empty($info['bundles']) || in_array($display->getTargetBundle(), $info['bundles'])) && $view->access($info['display'])) {
           // no parent for current_entity; it's used by the display's preExecute
           $view->current_entity = $entity;
 
