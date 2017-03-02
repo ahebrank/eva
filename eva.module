@@ -31,7 +31,7 @@ function eva_entity_extra_field_info() {
         );
         // Provide a separate extra field for the exposed form if there is any.
         if ($view['uses exposed']) {
-          $extra[$entity][$bundle]['display'][$view['name'] . '_' . $view['display'] . '_' . 'form'] = array(
+          $extra[$entity][$bundle]['display'][$view['name'] . '_' . $view['display'] . '_form'] = array(
             'label' => ((empty($view['title'])) ? $view['name'] : $view['title']) . ' (' . t('Exposed form') . ')',
             'description' => t('The exposed filter form of the view.'),
             'weight' => 9,
@@ -168,16 +168,47 @@ function eva_modules_disabled($modules) {
  * implemented an eva view
  */
 function _eva_reset() {
+  _eva_clear_detached();
   drupal_static_reset('eva_get_views');
   \Drupal::cache('render')->deleteAll();
 }
 
 /**
+ * An extra field no longer present is not automatically removed from a display config
+ * Run through all entity displays and clear out views that shouldn't be there
+ * this should be called at Views save and module install/remove
+ */
+function _eva_clear_detached() {
+  $cf = \Drupal::configFactory();
+  $views = eva_get_views();
+  foreach ($views as $entity => $eva_info) {
+    $config_names = $cf->listAll('core.entity_view_display.'.$entity);
+    foreach ($config_names as $id) {
+      $config = $cf->getEditable($id);
+      $config_data = $config->get();
+      foreach ($eva_info as $eva) {
+        $eva_field_name = $eva['name'] . '_' . $eva['display'];
+        if (array_key_exists($eva_field_name, $config_data['content'])) {
+          if (!in_array($config_data['bundle'], $eva['bundles'])) {
+            // the Eva is not longer attached, so clear it out
+            unset($config_data['content'][$eva_field_name]);
+            // exposed filter, too, if it's there
+            unset($config_data['content'][$eva_field_name . '_form']);
+            $config->setData($config_data);
+            $config->save();
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
  * Clear the field cache when view cache clears
  * this is intended to fire when a View is saved
- * hopefully it won't kick off an endless cache clearing loop
  */
 function eva_views_invalidate_cache() {
+  _eva_clear_detached();
   // see https://www.drupal.org/node/2281897
   \Drupal::entityManager()->clearCachedFieldDefinitions();
 }
