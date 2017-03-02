@@ -187,6 +187,11 @@ function _eva_clear_detached() {
       $config = $cf->getEditable($id);
       $config_data = $config->get();
       foreach ($eva_info as $eva) {
+        if (empty($eva['bundles'])) {
+          // special case, applies to every bundle in entity
+          // so skip the detachment check
+          continue;
+        }
         $eva_field_name = $eva['name'] . '_' . $eva['display'];
         if (array_key_exists($eva_field_name, $config_data['content'])) {
           if (!in_array($config_data['bundle'], $eva['bundles'])) {
