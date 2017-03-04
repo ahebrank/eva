@@ -168,7 +168,7 @@ function eva_modules_disabled($modules) {
  * implemented an eva view
  */
 function _eva_reset() {
-  _eva_clear_detached();
+  _eva_clear_detached(null, TRUE);
   drupal_static_reset('eva_get_views');
   \Drupal::cache('render')->deleteAll();
 }
@@ -177,30 +177,38 @@ function _eva_reset() {
  * An extra field no longer present is not automatically removed from a display config
  * Run through all entity displays and clear out views that shouldn't be there
  * this should be called at Views save and module install/remove
+ *   $remove_one: force removal of a particular 'viewname_displayid' EVA
+ *   $remove_all: remove all Evas
  */
-function _eva_clear_detached() {
+function _eva_clear_detached($remove_one = null, $remove_all = FALSE) {
   $cf = \Drupal::configFactory();
   $views = eva_get_views();
+
   foreach ($views as $entity => $eva_info) {
     $config_names = $cf->listAll('core.entity_view_display.'.$entity);
     foreach ($config_names as $id) {
       $config = $cf->getEditable($id);
       $config_data = $config->get();
       foreach ($eva_info as $eva) {
-        if (empty($eva['bundles'])) {
-          // special case, applies to every bundle in entity
-          // so skip the detachment check
-          continue;
-        }
         $eva_field_name = $eva['name'] . '_' . $eva['display'];
-        if (array_key_exists($eva_field_name, $config_data['content'])) {
-          if (!in_array($config_data['bundle'], $eva['bundles'])) {
-            // the Eva is not longer attached, so clear it out
-            unset($config_data['content'][$eva_field_name]);
-            // exposed filter, too, if it's there
-            unset($config_data['content'][$eva_field_name . '_form']);
-            $config->setData($config_data);
-            $config->save();
+        // eva should be considered for removal if one of these is true:
+        //  - all evas should be removed (i.e., when module is uninstalled)
+        //  - the current eva has at least on bundle specified (if no bundles are specified, an eva is attached to all bundles)
+        //  - the current eva is specifically targeted for removal (i.e., before deleting the display)
+        if ($remove_all || !empty($eva['bundles']) || ($eva_field_name == $remove_one)) {
+          // does the eva exist in this display config?
+          if (array_key_exists($eva_field_name, $config_data['content'])) {
+            // remove the eva if one of these is true:
+            //   - all evas should be removed
+            //   - the eva does not list the entity's bundle (any more)
+            //   - the eva is specifically targeted for removal
+            if ($remove_all || !in_array($config_data['bundle'], $eva['bundles']) || ($eva_field_name == $remove_one)) {
+              unset($config_data['content'][$eva_field_name]);
+              // exposed filter, too, if it's there
+              unset($config_data['content'][$eva_field_name . '_form']);
+              $config->setData($config_data);
+              $config->save();
+            }
           }
         }
       }
