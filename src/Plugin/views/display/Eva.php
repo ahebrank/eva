@@ -186,6 +186,7 @@ class Eva extends DisplayPluginBase {
   }
 
   public function validateOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::validateOptionsForm($form, $form_state);
     switch ($form_state->get('section')) {
       case 'entity_type':
         if (empty($form_state->getValue('entity_type'))) {
