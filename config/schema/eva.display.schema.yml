@@ -1,0 +1,3 @@
+views.display.entity_view:
+  type: views_display
+  label: 'EVA display options'
