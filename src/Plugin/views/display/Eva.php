@@ -204,6 +204,14 @@ class Eva extends DisplayPluginBase {
     return $errors;
   }
 
+  public function remove() {
+    // clean up display configs before the display disappears
+    $longname = $this->view->storage->get('id') . '_' . $this->display['id'];
+    _eva_clear_detached($longname);
+
+    parent::remove();
+  }
+
   public function submitOptionsForm(&$form, FormStateInterface $form_state) {
     parent::submitOptionsForm($form, $form_state);
 
