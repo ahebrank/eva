@@ -1,0 +1,14 @@
+uuid: 3b509b9b-938a-4294-a452-afb32075abf7
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: vymHlgJy26BuI5GGj9-IXjwR3dRC5C0tij4BpWJnoqw
+id: feedback
+label: 'Website feedback'
+recipients:
+  - andy@insidenewcity.com
+reply: ''
+weight: 0
+message: 'Your message has been sent.'
+redirect: ''

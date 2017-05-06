@@ -1,0 +1,14 @@
+uuid: 2a74d121-2868-41c9-a1a1-fb911af1dc66
+name: 'Eva Testing'
+mail: andy@insidenewcity.com
+slogan: ''
+page:
+  403: ''
+  404: ''
+  front: /node
+admin_compact_mode: false
+weight_select_max: 100
+langcode: en
+default_langcode: en
+_core:
+  default_config_hash: AyT9s8OUcclfALRE_imByOMgtZ19eOlqdF6zI3p7yqo
