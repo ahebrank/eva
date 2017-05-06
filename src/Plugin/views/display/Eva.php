@@ -282,15 +282,20 @@ class Eva extends DisplayPluginBase {
   
   public function getPath() {
     if (isset($this->view->current_entity)) {
-      $uri = $this->view->current_entity->url();
+      /** @var \Drupal\Core\Entity\EntityInterface $current_entity */
+      $current_entity = $this->view->current_entity;
+
+      /** @var \Drupal\Core\Url $uri */
+      $uri = $current_entity->toUrl();
       if ($uri) {
-        $uri['options']['absolute'] = TRUE;
-        return url($uri['path'], $uri['options']);
+        $uri->setAbsolute(TRUE);
+        return $uri->toUriString();
       }
     }
+
     return parent::getPath();
   }
- 
+
   function execute() {
     // Prior to this being called, the $view should already be set to this
     // display, and arguments should be set on the view.
