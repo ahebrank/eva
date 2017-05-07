@@ -1,6 +1,6 @@
-uuid: 7590be86-bb91-4270-8baf-255ec39c657b
+uuid: e1445677-2fea-4f0c-a9cf-7a4822983239
 langcode: en
-status: false
+status: true
 dependencies:
   config:
     - node.type.article
@@ -8,8 +8,8 @@ dependencies:
     - eva
     - node
     - user
-id: '2874662'
-label: '2874662'
+id: 2873385_eva
+label: 2873385-eva
 module: views
 description: ''
 tag: ''
@@ -149,46 +149,6 @@ display:
           entity_type: node
           entity_field: type
           plugin_id: bundle
-        title:
-          id: title
-          table: node_field_data
-          field: title
-          relationship: none
-          group_type: group
-          admin_label: ''
-          operator: '='
-          value: ''
-          group: 1
-          exposed: true
-          expose:
-            operator_id: title_op
-            label: Title
-            description: ''
-            use_operator: false
-            operator: title_op
-            identifier: title
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              administrator: '0'
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          entity_type: node
-          entity_field: title
-          plugin_id: string
       sorts:
         created:
           id: created
@@ -208,8 +168,53 @@ display:
       header: {  }
       footer: {  }
       empty: {  }
-      relationships: {  }
-      arguments: {  }
+      relationships:
+        field_page:
+          id: field_page
+          table: node__field_page
+          field: field_page
+          relationship: none
+          group_type: group
+          admin_label: 'field_page: Content'
+          required: false
+          plugin_id: standard
+      arguments:
+        nid:
+          id: nid
+          table: node_field_data
+          field: nid
+          relationship: field_page
+          group_type: group
+          admin_label: ''
+          default_action: default
+          exception:
+            value: all
+            title_enable: false
+            title: All
+          title_enable: false
+          title: ''
+          default_argument_type: node
+          default_argument_options: {  }
+          default_argument_skip_url: false
+          summary_options:
+            base_path: ''
+            count: true
+            items_per_page: 25
+            override: false
+          summary:
+            sort_order: asc
+            number_of_records: 0
+            format: default_summary
+          specify_validation: false
+          validate:
+            type: none
+            fail: 'not found'
+          validate_options: {  }
+          break_phrase: false
+          not: false
+          entity_type: node
+          entity_field: nid
+          plugin_id: node_nid
       display_extenders: {  }
     cache_metadata:
       max-age: -1
@@ -231,31 +236,6 @@ display:
       entity_type: node
       bundles:
         - page
-      use_more: true
-      defaults:
-        use_more: false
-        use_more_always: false
-        use_more_text: false
-      use_more_always: true
-      use_more_text: more
-    cache_metadata:
-      max-age: -1
-      contexts:
-        - 'languages:language_content'
-        - 'languages:language_interface'
-        - url
-        - url.query_args
-        - 'user.node_grants:view'
-        - user.permissions
-      tags: {  }
-  page_1:
-    display_plugin: page
-    id: page_1
-    display_title: Page
-    position: 2
-    display_options:
-      display_extenders: {  }
-      path: '2874662'
     cache_metadata:
       max-age: -1
       contexts:
