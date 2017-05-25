@@ -21,17 +21,23 @@ abstract class EvaTestBase extends BrowserTestBase {
 		'node',
 		'views',
 		'user',
+		'text',
 	];
 
 	/**
-	 * Number of Articles to generate.
+	 * Number of articles to generate.
 	 */
 	protected $article_count = 20;
 
 	/**
+	 * Number of pages to generate.
+	 */
+	protected $page_count = 10;
+
+	/**
 	 * Hold the page NID.
 	 */
-	protected $page_nid = 0;
+	protected $nids = [];
 
 	/**
 	* {@inheritdoc}
@@ -46,18 +52,37 @@ abstract class EvaTestBase extends BrowserTestBase {
 	* Create some example nodes.
 	*/
 	protected function makeNodes() {
-		$node = $this->createNode([
-			'title' => 'Test Page',
-			'type' => 'page',
-		]);
-		$this->page_nid = $node->id();
 
-		for ($i = 0; $i < $this->article_count; $i++) {
-			$this->createNode([
-				'title' => sprintf('Article %d', $i + 1),
-				'type' => 'article',
+		// single page for simple Eva test
+		$node = $this->createNode([
+			'title' => 'Test Eva',
+			'type' => 'just_eva',
+		]);
+		$this->nids['just_eva'] = $node->id();
+
+		// pages for lists-in-lists
+		$this->nids['pages'] = [];
+		for ($i = 0; $i < $this->page_count; $i++) {
+			$node = $this->createNode([
+				'title' => sprintf('Page %d', $i + 1),
+				'type' => 'page_with_related_articles',
 			]);
+			$this->nids['pages'][] = $node->id();
+		}
+
+		// articles
+		for ($i = 0; $i < $this->article_count; $i++) {
+			$node = $this->createNode([
+				'title' => sprintf('Article %d', $i + 1),
+				'type' => 'mini',
+			]);
+
+			// associate articles with assorted pages
+			$k = array_rand($this->nids['pages'], 1);
+			$node->field_page[] = $this->nids['pages'][$k];
+			$node->save();
 		}
 	}
+
 
 }

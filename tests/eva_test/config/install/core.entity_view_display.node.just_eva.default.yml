@@ -3,14 +3,14 @@ langcode: en
 status: true
 dependencies:
   config:
-    - node.type.page
+    - node.type.just_eva
   module:
     - user
 _core:
   default_config_hash: g1S3_GLaxq4l3I9RIca5Mlz02MxI2KmOquZpHw59akM
 id: node.page.default
 targetEntityType: node
-bundle: page
+bundle: just_eva
 mode: default
 content:
   articles_entity_view_1:

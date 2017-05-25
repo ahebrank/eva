@@ -1,15 +1,15 @@
-uuid: 5bada283-a55e-43ad-a601-7ab22f81e09f
+uuid: 50424ddd-9fa9-4190-ada7-c659d3cf52a8
 langcode: en
 status: true
 dependencies:
   config:
-    - node.type.mini
+    - core.entity_view_mode.node.full
+    - node.type.page_with_related_articles
   module:
-    - eva
     - node
     - user
-id: articles
-label: Articles
+id: '2873385'
+label: '2873385'
 module: views
 description: ''
 tag: ''
@@ -54,18 +54,11 @@ display:
           offset: 0
       style:
         type: default
-        options:
-          grouping: {  }
-          row_class: ''
-          default_row_class: true
-          uses_fields: false
       row:
-        type: fields
+        type: 'entity:node'
         options:
-          inline: {  }
-          separator: ''
-          hide_empty: false
-          default_field_elements: true
+          relationship: none
+          view_mode: full
       fields:
         title:
           id: title
@@ -131,7 +124,7 @@ display:
           table: node_field_data
           field: type
           value:
-            mini: mini
+            page: page_with_related_articles
           entity_type: node
           entity_field: type
           plugin_id: bundle
@@ -151,6 +144,7 @@ display:
           expose:
             label: ''
           granularity: second
+      title: '2873385'
       header: {  }
       footer: {  }
       empty: {  }
@@ -165,16 +159,14 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
-  entity_view_1:
-    display_plugin: entity_view
-    id: entity_view_1
-    display_title: EVA
+  page_1:
+    display_plugin: page
+    id: page_1
+    display_title: Page
     position: 1
     display_options:
       display_extenders: {  }
-      entity_type: node
-      bundles:
-        - just_eva
+      path: '2873385'
     cache_metadata:
       max-age: -1
       contexts:
