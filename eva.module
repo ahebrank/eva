@@ -105,7 +105,8 @@ function eva_entity_view(array &$build, EntityInterface $entity, EntityViewDispl
       if ($view = Views::getView($info['name'])) {
         $view->setDisplay($info['display']);
         if ((empty($info['bundles']) || in_array($display->getTargetBundle(), $info['bundles'])) && $view->access($info['display'])) {
-          // no parent for current_entity; it's used by the display's preExecute
+
+          // save the entity for path calculation
           $view->current_entity = $entity;
 
           // exposed form
@@ -115,6 +116,40 @@ function eva_entity_view(array &$build, EntityInterface $entity, EntityViewDispl
             $build[$longname . '_form'] = $exposed_form->renderExposedForm(TRUE);
           }
 
+          // gather info about the attched-to entity
+          $entity_type = $view->display_handler->getOption('entity_type');
+          $entity_info = \Drupal::entityManager()->getDefinition($entity_type);
+      
+          $arg_mode = $view->display_handler->getOption('argument_mode');
+          if ($arg_mode == 'token') {
+            if ($token_string = $view->display_handler->getOption('default_argument')) {
+              // Now do the token replacement.
+              $token_values = eva_get_arguments_from_token_string($token_string, $entity_type, $entity);
+              $new_args = array();
+              // We have to be careful to only replace arguments that have tokens.
+              foreach ($token_values as $key => $value) {
+                $new_args[Html::escape($key)] = Html::escape($value);
+              }
+      
+              $view->args = $new_args;
+            }
+          }
+          elseif ($arg_mode == 'id') {
+            $view->args = array($entity->id());
+          }
+
+          // add an argument cache key 
+          // If there are more than one of the same Eva on the same page,
+          // the first one gets cached.
+          // Presumably they should vary by contextual argument, so this 
+          // adds a cache key for the argument(s).
+          // see https://www.drupal.org/node/2873385
+          if ($view->args) {
+            $view->element['#cache'] += ['keys' => []];
+            $view->element['#cache']['keys'] = array_merge([implode(':', $view->args)], $view->element['#cache']['keys']);
+          }
+
+          // build the render
           $element = $view->buildRenderable($info['display']);
 
           if (!empty($element)) {
