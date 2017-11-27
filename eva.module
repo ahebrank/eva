@@ -198,6 +198,29 @@ function eva_modules_disabled($modules) {
 }
 
 /**
+ * Implements hook_ENTITY_TYPE_presave().
+ * Address https://www.drupal.org/node/2922112: if Eva displays are removed,
+ * remove the module dependency from the View
+ */
+function eva_view_presave(EntityInterface $view) {
+  $dependencies = $view->get('dependencies');
+  if (in_array('eva', $dependencies['module'])) {
+    $eva_count = 0;
+    foreach ($view->get('display') as $display_id => $display) {
+      // is there a display that's still using Eva?
+      if ($display['display_plugin'] == 'entity_view') {
+        $eva_count += 1;
+      }
+    }
+    // no Eva's? Remove the dependency
+    if ($eva_count == 0) {
+      $dependencies['module'] = array_values(array_diff($dependencies['module'], ['eva']));
+      $view->set('dependencies', $dependencies);
+    }
+  }
+}
+
+/**
  * Cache clearing helper function
  * Reset the static cache in case any of the disabled modules
  * implemented an eva view
