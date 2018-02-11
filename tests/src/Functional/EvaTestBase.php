@@ -6,83 +6,84 @@ use Drupal\Tests\BrowserTestBase;
 
 /**
  * Browser testing for Eva.
- *
  */
 abstract class EvaTestBase extends BrowserTestBase {
 
-	/**
-	 * Modules to install.
-	 *
-	 * @var array
-	 */
-	public static $modules = [
-		'eva',
-		'eva_test',
-		'node',
-		'views',
-		'user',
-		'text',
-	];
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = [
+    'eva',
+    'eva_test',
+    'node',
+    'views',
+    'user',
+    'text',
+  ];
 
-	/**
-	 * Number of articles to generate.
-	 */
-	protected $article_count = 20;
+  /**
+   * Number of articles to generate.
+   *
+   * @var int
+   */
+  protected $articleCount = 20;
 
-	/**
-	 * Number of pages to generate.
-	 */
-	protected $page_count = 10;
+  /**
+   * Number of pages to generate.
+   *
+   * @var int
+   */
+  protected $pageCount = 10;
 
-	/**
-	 * Hold the page NID.
-	 */
-	protected $nids = [];
+  /**
+   * Hold the page NID.
+   *
+   * @var array
+   */
+  protected $nids = [];
 
-	/**
-	* {@inheritdoc}
-	*/
-	protected function setUp() {
-		parent::setUp();
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
 
-		$this->makeNodes();
-	}
+    $this->makeNodes();
+  }
 
-	/**
-	* Create some example nodes.
-	*/
-	protected function makeNodes() {
+  /**
+   * Create some example nodes.
+   */
+  protected function makeNodes() {
+    // Single page for simple Eva test.
+    $node = $this->createNode([
+      'title' => 'Test Eva',
+      'type' => 'just_eva',
+    ]);
+    $this->nids['just_eva'] = $node->id();
 
-		// single page for simple Eva test
-		$node = $this->createNode([
-			'title' => 'Test Eva',
-			'type' => 'just_eva',
-		]);
-		$this->nids['just_eva'] = $node->id();
+    // Pages for lists-in-lists.
+    $this->nids['pages'] = [];
+    for ($i = 0; $i < $this->pageCount; $i++) {
+      $node = $this->createNode([
+        'title' => sprintf('Page %d', $i + 1),
+        'type' => 'page_with_related_articles',
+      ]);
+      $this->nids['pages'][] = $node->id();
+    }
 
-		// pages for lists-in-lists
-		$this->nids['pages'] = [];
-		for ($i = 0; $i < $this->page_count; $i++) {
-			$node = $this->createNode([
-				'title' => sprintf('Page %d', $i + 1),
-				'type' => 'page_with_related_articles',
-			]);
-			$this->nids['pages'][] = $node->id();
-		}
+    // Articles.
+    for ($i = 0; $i < $this->articleCount; $i++) {
+      $node = $this->createNode([
+        'title' => sprintf('Article %d', $i + 1),
+        'type' => 'mini',
+      ]);
 
-		// articles
-		for ($i = 0; $i < $this->article_count; $i++) {
-			$node = $this->createNode([
-				'title' => sprintf('Article %d', $i + 1),
-				'type' => 'mini',
-			]);
-
-			// associate articles with assorted pages
-			$k = array_rand($this->nids['pages'], 1);
-			$node->field_page[] = $this->nids['pages'][$k];
-			$node->save();
-		}
-	}
-
+      // Associate articles with assorted pages.
+      $k = array_rand($this->nids['pages'], 1);
+      $node->field_page[] = $this->nids['pages'][$k];
+      $node->save();
+    }
+  }
 
 }

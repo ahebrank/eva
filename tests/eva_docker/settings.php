@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @file
+ * Settings file.
+ */
+
+use Drupal\Component\Assertion\Handle;
+
 include 'default.settings.php';
 /**
  * @file
@@ -15,7 +22,7 @@ include 'default.settings.php';
  * at the bottom of 'sites/example.com/settings.php'.
  */
 
- if (file_exists(__DIR__ . '/settings.local.php')) {
+if (file_exists(__DIR__ . '/settings.local.php')) {
   include __DIR__ . '/settings.local.php';
 }
 
@@ -36,7 +43,7 @@ include 'default.settings.php';
  * @see https://wiki.php.net/rfc/expectations
  */
 assert_options(ASSERT_ACTIVE, TRUE);
-\Drupal\Component\Assertion\Handle::register();
+Handle::register();
 
 /**
  * Enable local development services.
@@ -113,7 +120,7 @@ $config_directories[CONFIG_SYNC_DIRECTORY] = 'sync';
 $settings['install_profile'] = 'standard';
 $settings['skip_permissions_hardening'] = TRUE;
 $settings['hash_salt'] = 'foo';
-$databases['default']['default'] = array(
+$databases['default']['default'] = [
   'database' => 'drupal',
   'username' => 'drupal',
   'password' => 'drupal',
@@ -122,4 +129,4 @@ $databases['default']['default'] = array(
   'port' => '3306',
   'namespace' => 'Drupal\Core\Database\Driver\mysql',
   'driver' => 'mysql',
-	);
+];
