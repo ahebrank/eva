@@ -50,4 +50,5 @@ Actual D6 release, and version 2.0: Larry Garfield "Crell"
 
 D7 port and tomfoolery: Jeff Eaton "eaton" (http://drupal.org/user/16496)
 
-D8 port started by Mike Kadin "mkadin" (https://www.drupal.org/u/mkadin) and rounded out by Andy Hebrank "ahebrank" (https://www.drupal.org/u/ahebrank)
+D8 port started by Mike Kadin "mkadin" (https://www.drupal.org/u/mkadin) and
+rounded out by Andy Hebrank "ahebrank" (https://www.drupal.org/u/ahebrank).
