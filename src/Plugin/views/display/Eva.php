@@ -50,6 +50,14 @@ class Eva extends DisplayPluginBase {
   protected $currentPathStack;
 
   /**
+   * Whether the display allows attachments.
+   *
+   * @var bool
+   *   TRUE if the display can use attachments, or FALSE otherwise.
+   */
+  protected $usesAttachments = TRUE;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entityTypeManager, EntityTypeBundleInfoInterface $bundleInfo, CurrentPathStack $currentPathStack) {
