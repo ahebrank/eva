@@ -108,13 +108,6 @@ function eva_entity_view(array &$build, EntityInterface $entity, EntityViewDispl
           // Save the entity for path calculation.
           $view->current_entity = $entity;
 
-          // Exposed form.
-          if ($info['uses exposed']) {
-            $view->initHandlers();
-            $exposed_form = $view->display_handler->getPlugin('exposed_form');
-            $build[$longname . '_form'] = $exposed_form->renderExposedForm(TRUE);
-          }
-
           // Gather info about the attached-to entity.
           $entity_type = $view->display_handler->getOption('entity_type');
           $arg_mode = $view->display_handler->getOption('argument_mode');
@@ -146,6 +139,13 @@ function eva_entity_view(array &$build, EntityInterface $entity, EntityViewDispl
           if ($view->args) {
             $view->element['#cache'] += ['keys' => []];
             $view->element['#cache']['keys'] = array_merge([implode(':', $view->args)], $view->element['#cache']['keys']);
+          }
+
+          // Now that arguments are set, build the exposed form.
+          if ($info['uses exposed']) {
+            $view->initHandlers();
+            $exposed_form = $view->display_handler->getPlugin('exposed_form');
+            $build[$longname . '_form'] = $exposed_form->renderExposedForm(TRUE);
           }
 
           // Build the render.
