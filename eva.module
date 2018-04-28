@@ -152,7 +152,7 @@ function eva_entity_view(array &$build, EntityInterface $entity, EntityViewDispl
           $element = $view->buildRenderable($info['display']);
 
           if (!empty($element)) {
-            $build[$longname][] = $element;
+            $build[$longname] = $element;
           }
         }
       }
