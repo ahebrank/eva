@@ -10,6 +10,7 @@ use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\SafeMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\eva\ViewDisplays;
 
 /**
  * The plugin that handles an EVA display in views.
@@ -50,6 +51,13 @@ class Eva extends DisplayPluginBase {
   protected $currentPathStack;
 
   /**
+   * EVA utiilities.
+   *
+   * @var \Drupal\eva\ViewDisplays
+   */
+  protected $evaViewDisplays;
+
+  /**
    * Whether the display allows attachments.
    *
    * @var bool
@@ -60,11 +68,12 @@ class Eva extends DisplayPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entityTypeManager, EntityTypeBundleInfoInterface $bundleInfo, CurrentPathStack $currentPathStack) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entityTypeManager, EntityTypeBundleInfoInterface $bundleInfo, CurrentPathStack $currentPathStack, ViewDisplays $evaViewDisplays) {
     parent::__construct([], $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entityTypeManager;
     $this->bundleInfo = $bundleInfo;
     $this->currentPathStack = $currentPathStack;
+    $this->evaViewDisplays = $evaViewDisplays;
   }
 
   /**
@@ -77,7 +86,8 @@ class Eva extends DisplayPluginBase {
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('path.current')
+      $container->get('path.current'),
+      $container->get('eva.view_displays')
     );
   }
 
@@ -269,7 +279,7 @@ class Eva extends DisplayPluginBase {
   public function remove() {
     // Clean up display configs before the display disappears.
     $longname = $this->view->storage->get('id') . '_' . $this->display['id'];
-    _eva_clear_detached($longname);
+    $this->evaViewDisplays->clear_detached($longname);
 
     parent::remove();
   }
