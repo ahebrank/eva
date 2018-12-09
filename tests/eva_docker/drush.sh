@@ -1,2 +1,3 @@
 #!/bin/bash
-docker-compose exec drupal bash -c "cd web && drush $@"
+CMD="cd web && drush $@"
+docker-compose exec drupal bash -c "$CMD"
