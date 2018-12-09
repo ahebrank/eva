@@ -10,7 +10,5 @@ Prerequisites:
 Quickstart:
 
 - docker-compose up
-- ./dcomposer install
-- ./ddrush site-install standard --site-name=test
-- ./ddrush en -y eva_test
+- ./install.sh
 - ./test.sh
