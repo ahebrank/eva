@@ -235,6 +235,23 @@ class Eva extends DisplayPluginBase {
           '#default_value' => $this->getOption('default_argument'),
           '#description' => $this->t('You may use token replacement to provide arguments based on the current entity. Separate arguments with "/".'),
         ];
+
+        // Add a token browser.
+        if (\Drupal::service('module_handler')->moduleExists('token')) {
+          $token_types = [$entity_type => $entity_type];
+          $token_mapper = \Drupal::service('token.entity_mapper');
+          if (!empty($token_types)) {
+            $token_types = array_map(function ($type) use ($token_mapper) {
+              return $token_mapper->getTokenTypeForEntityType($type);
+            }, (array) $token_types);
+          }
+          $form['token']['browser'] = [
+            '#theme' => 'token_tree_link',
+            '#token_types' => $token_types,
+            '#global_types' => TRUE,
+            '#show_nested' => FALSE,
+          ];
+        }
         break;
 
       case 'show_title':
