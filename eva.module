@@ -158,7 +158,7 @@ function eva_view_presave(EntityInterface $view) {
 function eva_views_invalidate_cache() {
   \Drupal::service('eva.view_displays')->clear_detached();
   // See https://www.drupal.org/node/2281897
-  \Drupal::entityManager()->clearCachedFieldDefinitions();
+  \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
 }
 
 /**

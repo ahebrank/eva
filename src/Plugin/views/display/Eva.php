@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\eva\ViewDisplays;
 
@@ -149,7 +149,7 @@ class Eva extends DisplayPluginBase {
     $options['arguments'] = [
       'category' => 'entity_view',
       'title' => $this->t('Arguments'),
-      'value' => empty($argument_mode) ? $this->t('None') : SafeMarkup::checkPlain($argument_mode),
+      'value' => empty($argument_mode) ? $this->t('None') : Html::escape($argument_mode),
     ];
 
     $options['show_title'] = [
