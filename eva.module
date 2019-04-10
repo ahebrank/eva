@@ -96,7 +96,7 @@ function eva_entity_view(array &$build, EntityInterface $entity, EntityViewDispl
           }
 
           // Now that arguments are set, build the exposed form.
-          if ($info['uses exposed']) {
+          if ($info['uses exposed'] && $display->getComponent($longname . '_form')) {
             $view->initHandlers();
             $exposed_form = $view->display_handler->getPlugin('exposed_form');
             $build[$longname . '_form'] = $exposed_form->renderExposedForm(TRUE);
