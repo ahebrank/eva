@@ -58,4 +58,45 @@ class EvaTest extends EvaTestBase {
     );
   }
 
+  /**
+   * Test issue described in https://www.drupal.org/project/eva/issues/3059233
+   */
+  public function test3059233() {
+    $assert = $this->assertSession();
+
+    // Test that an EVA shows up.
+    $this->drupalGet('/node/' . $this->nids['just_eva']);
+    $assert->statusCodeEquals(200);
+
+    $this->assertEquals(
+        $this->articleCount,
+        \count($this->xpath('//div[contains(@class, "view-eva")]//div[contains(@class, "views-row")]')),
+        sprintf('Found %d articles in Eva.', $this->articleCount)
+    );
+
+    // Duplicate the articles EVA, change the node type to attach to.
+    $orig = \Drupal::service('entity_type.manager')->getStorage('view')->load('articles');
+    $new = $orig->createDuplicate();
+    $new->set('id', 'articles_2');
+    $display = $new->get('display');
+    $display['entity_view_1']['display_options']['bundles'] = ['another_eva'];
+    $new->set('display', $display);
+    $new->save();
+
+    // Make another page.
+    $node = $this->createNode([
+      'title' => 'Test Eva 2',
+      'type' => 'another_eva',
+    ]);
+    $new_page_nid = $node->id();
+
+    // Test the new EVA shows up.
+    $this->drupalGet('/node/' . $new_page_nid);
+    $this->assertEquals(
+      $this->articleCount,
+      \count($this->xpath('//div[contains(@class, "view-eva")]//div[contains(@class, "views-row")]')),
+      sprintf('Found %d articles in Eva.', $this->articleCount)
+    );
+  }
+
 }

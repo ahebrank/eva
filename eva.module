@@ -69,7 +69,7 @@ function eva_entity_view(array &$build, EntityInterface $entity, EntityViewDispl
           if ($arg_mode == 'token') {
             if ($token_string = $view->display_handler->getOption('default_argument')) {
               // Now do the token replacement.
-              $token_values = $token_handler->get_arguments_from_token_string($token_string, $entity_type, $entity);
+              $token_values = $token_handler->getArgumentsFromTokenString($token_string, $entity_type, $entity);
               $new_args = [];
               // We have to be careful to only replace arguments that have
               // tokens.
@@ -156,7 +156,9 @@ function eva_view_presave(EntityInterface $view) {
  * Implements hook_views_invalidate_cache().
  */
 function eva_views_invalidate_cache() {
-  \Drupal::service('eva.view_displays')->clear_detached();
+  $utilities = \Drupal::service('eva.view_displays');
+  $utilities->clearDetached();
+  $utilities->invalidateCaches();
   // See https://www.drupal.org/node/2281897
   \Drupal::entityManager()->clearCachedFieldDefinitions();
 }

@@ -5,17 +5,23 @@ namespace Drupal\eva;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Utility\Token;
 
+/**
+ * Token handling service.
+ */
 class TokenHandler {
 
   /**
+   * The token service.
+   *
    * @var \Drupal\Core\Utility\Token
    */
   protected $token;
 
   /**
-   * Undocumented function
+   * Inject token dependencies.
    *
-   * @param Token $token
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token service.
    */
   public function __construct(Token $token) {
     $this->token = $token;
@@ -43,7 +49,7 @@ class TokenHandler {
    * @return array
    *   An array of argument values.
    */
-  function get_arguments_from_token_string($string, $type, $object) {
+  public function getArgumentsFromTokenString($string, $type, $object) {
     $args = trim($string);
     if (empty($args)) {
       return [];

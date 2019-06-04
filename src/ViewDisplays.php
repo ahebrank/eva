@@ -7,43 +7,53 @@ use Drupal\views\Views;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 
+/**
+ * EVA utiltity service.
+ */
 class ViewDisplays {
 
   /**
    * The default cache bin.
    *
-   * @var CacheBackendInterface
+   * @var Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $default_cache;
+  protected $defaultCache;
 
   /**
    * The render cache bin.
    *
-   * @var CacheBackendInterface
+   * @var Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $render_cache;
+  protected $renderCache;
 
-  protected $config_factory;
+  /**
+   * Handle module configuration.
+   *
+   * @var [rupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
 
   /**
    * The name of the cache key for the list of EVAs.
-   * 
+   *
    * @var string
    */
-  private $cache_id = 'eva.views_list';
+  private $cacheId = 'eva.views_list';
 
-  
   /**
    * Create a ViewDisplays helper class.
    *
-   * @param CacheBackendInterface $default_cache
-   * @param CacheBackendInterface $render_cache
-   * @param ConfigFactoryInterface $config_factory
+   * @param Drupal\Core\Cache\CacheBackendInterface $default_cache
+   *   Cache service.
+   * @param Drupal\Core\Cache\CacheBackendInterface $render_cache
+   *   Render cache service.
+   * @param Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   Configuration service.
    */
   public function __construct(CacheBackendInterface $default_cache, CacheBackendInterface $render_cache, ConfigFactoryInterface $config_factory) {
-    $this->default_cache = $default_cache;
-    $this->render_cache = $render_cache;
-    $this->config_factory = $config_factory;
+    $this->defaultCache = $default_cache;
+    $this->renderCache = $render_cache;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -66,15 +76,13 @@ class ViewDisplays {
    * @param string|null $type
    *   The entity type we want to retrieve views for. If NULL is
    *   specified, views for all entity types will be returned.
-   * @param bool $reset
-   *   Force a rebuild of the data, defaults to false.
    *
    * @return array
    *   An array of view name/display name values, or an empty array().
    */
-  public function get($type = NULL, $reset = FALSE) {
-    // collect a list of EVAs and cache it
-    $cache = $this->default_cache->get($this->cache_id);
+  public function get($type = NULL) {
+    // Collect a list of EVAs and cache it.
+    $cache = $this->defaultCache->get($this->cacheId);
 
     $used_views = [];
     if ($cache) {
@@ -83,16 +91,16 @@ class ViewDisplays {
 
     if (!$used_views) {
       $views = Views::getApplicableViews('uses_hook_entity_view');
-    
+
       foreach ($views as $data) {
         list($view_name, $display_id) = $data;
         $view = Views::getView($view_name);
-      
+
         // Initialize handlers, to determine if the view uses exposed filters.
         $view->setDisplay($display_id);
         $view->initHandlers();
         $display = $view->display_handler;
-      
+
         $view_entity = $display->getOption('entity_type');
         $used_views[$view_entity][] = [
           'name' => $view_name,
@@ -105,9 +113,9 @@ class ViewDisplays {
         $view->destroy();
       }
 
-      $this->default_cache->set($this->cache_id, $used_views, CacheBackendInterface::CACHE_PERMANENT);
+      $this->defaultCache->set($this->cacheId, $used_views, CacheBackendInterface::CACHE_PERMANENT);
     }
-  
+
     if (!is_null($type)) {
       return isset($used_views[$type]) ? $used_views[$type] : [];
     }
@@ -115,32 +123,39 @@ class ViewDisplays {
   }
 
   /**
-   * Cache clearing helper function.
-   *
-   * Reset the static cache in case any of the disabled modules implemented an
-   * eva view.
-  */
+   * Reset display configurations and cache when enabling/disabling EVA.
+   */
   public function reset() {
-    $this->clear_detached(NULL, TRUE);
-    $this->default_cache->invalidate($this->cache_id);
-    $this->render_cache->deleteAll();
+    $this->clearDetached(NULL, TRUE);
+    $this->invalidateCaches();
   }
 
   /**
-   * Remove a removed extra field to entity displays.
-   *
-   * Run through all entity displays and clear out views that shouldn't be there.
-   * This should be called at Views save and module install/remove
-   *   $remove_one: force removal of a particular 'viewname_displayid' EVA
-   *   $remove_all: remove all Evas.
+   * Reset render cache and EVA view list.
    */
-  public function clear_detached($remove_one = NULL, $remove_all = FALSE) {
+  public function invalidateCaches() {
+    $this->defaultCache->invalidate($this->cacheId);
+    $this->renderCache->deleteAll();
+  }
+
+  /**
+   * Remove a removed extra field from entity displays.
+   *
+   * Run through all entity displays, clear out views that shouldn't be there.
+   * This should be called at Views save and module install/remove.
+   *
+   * @param string|null $remove_one
+   *   Force removal of a particular 'viewname_displayid' EVA.
+   * @param bool $remove_all
+   *   Remove all EVAs.
+   */
+  public function clearDetached($remove_one = NULL, $remove_all = FALSE) {
     $views = $this->get();
-  
+
     foreach ($views as $entity => $eva_info) {
-      $config_names = $this->config_factory->listAll('core.entity_view_display.' . $entity);
+      $config_names = $this->configFactory->listAll('core.entity_view_display.' . $entity);
       foreach ($config_names as $id) {
-        $config = $this->config_factory->getEditable($id);
+        $config = $this->configFactory->getEditable($id);
         $config_data = $config->get();
         foreach ($eva_info as $eva) {
           $eva_field_name = $eva['name'] . '_' . $eva['display'];
@@ -170,4 +185,5 @@ class ViewDisplays {
       }
     }
   }
+
 }
