@@ -59,7 +59,7 @@ class EvaTest extends EvaTestBase {
   }
 
   /**
-   * Test issue described in https://www.drupal.org/project/eva/issues/3059233
+   * Test issue described in https://www.drupal.org/project/eva/issues/3059233.
    */
   public function test3059233() {
     $assert = $this->assertSession();
@@ -88,12 +88,23 @@ class EvaTest extends EvaTestBase {
       'title' => 'Test Eva 2',
       'type' => 'another_eva',
     ]);
-    $new_page_nid = $node->id();
+    $this->nids['new_page'] = $node->id();
 
     // Test the new EVA shows up.
-    $this->drupalGet('/node/' . $new_page_nid);
+    $this->drupalGet('/node/' . $this->nids['new_page']);
     $this->assertEquals(
       $this->articleCount,
+      \count($this->xpath('//div[contains(@class, "view-eva")]//div[contains(@class, "views-row")]')),
+      sprintf('Found %d articles in Eva.', $this->articleCount)
+    );
+
+    // Delete the View (test https://www.drupal.org/project/eva/issues/3017744).
+    $new->delete();
+
+    // Test the EVA is gone.
+    $this->drupalGet('/node/' . $this->nids['new_page']);
+    $this->assertEquals(
+      0,
       \count($this->xpath('//div[contains(@class, "view-eva")]//div[contains(@class, "views-row")]')),
       sprintf('Found %d articles in Eva.', $this->articleCount)
     );
