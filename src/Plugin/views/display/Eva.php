@@ -296,7 +296,7 @@ class Eva extends DisplayPluginBase {
   public function remove() {
     // Clean up display configs before the display disappears.
     $longname = $this->view->storage->get('id') . '_' . $this->display['id'];
-    $this->evaViewDisplays->clear_detached($longname);
+    $this->evaViewDisplays->clearDetached($longname);
 
     parent::remove();
   }
