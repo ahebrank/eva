@@ -355,10 +355,12 @@ class Eva extends DisplayPluginBase {
       $current_entity = $this->view->current_entity;
 
       /** @var \Drupal\Core\Url $uri */
-      $uri = $current_entity->toUrl();
-      if ($uri) {
-        $uri->setAbsolute(TRUE);
-        return $uri->toUriString();
+      if ($current_entity->hasLinkTemplate('canonical')) {
+        $uri = $current_entity->toUrl('canonical');
+        if ($uri) {
+          $uri->setAbsolute(TRUE);
+          return $uri->toUriString();
+        }
       }
     }
 
